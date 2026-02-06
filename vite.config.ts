@@ -6,7 +6,8 @@ export default defineConfig(({ mode }) => {
   const isDev = mode === "development";
 
   return {
-    base: isDev ? "/" : "/lsers-professional-services/",
+    base: "/lsers-professional-services/",
+
     plugins: [react()],
     server: {
       port: 3000,

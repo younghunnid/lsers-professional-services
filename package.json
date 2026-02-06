@@ -1,22 +1,67 @@
 {
   "name": "lsers-professional-services",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Professional Services & Goods Marketplace - Connecting verified professionals with clients in Liberia and beyond",
+  "author": "LSERS Team <hello@lsers.pro>",
   "type": "module",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron-dev": "electron .",
+    "electron-build": "npm run build && electron-builder build --mac --publish never",
+    "electron-dmg": "npm run build && electron-builder build --mac dmg --publish never"
   },
   "dependencies": {
-    "@google/genai": "^1.34.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.24",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
+  },
+  "build": {
+    "appId": "com.lsers.professional-services",
+    "productName": "LSERS Professional Services",
+    "files": [
+      "dist/**/*",
+      "electron/main.js",
+      "electron/preload.js",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.business",
+      "icon": "assets/icon.icns"
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    }
   }
 }

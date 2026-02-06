@@ -1,7 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { startServiceChat } from '../services/gemini';
-import { Chat } from '@google/genai';
 import AudioRecorder from './AudioRecorder';
 
 const ChatBot: React.FC = () => {
@@ -17,7 +15,7 @@ const ChatBot: React.FC = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [chatSession, setChatSession] = useState<Chat | null>(null);
+  const [chatSession, setChatSession] = useState<any>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isOpenRef = useRef(isOpen);
 
@@ -48,6 +46,8 @@ const ChatBot: React.FC = () => {
             }
           }, 5000);
         }
+      }).catch(err => {
+        console.error('Failed to initialize chat session', err);
       });
     }
 
@@ -69,7 +69,7 @@ const ChatBot: React.FC = () => {
 
   const handleSend = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!input.trim() || isLoading || !chatSession) return;
+    if (!input.trim() || isLoading) return;
 
     const userMsg = input.trim();
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
@@ -77,15 +77,15 @@ const ChatBot: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const result = await chatSession.sendMessage({ message: userMsg });
-      const aiText = result.text || "I'm sorry, I couldn't process that. Please try again.";
-      
-      setMessages(prev => [...prev, { role: 'ai', text: aiText }]);
-      
-      // If the user happens to close the chat while AI is thinking, increment unread
-      if (!isOpen) {
-        setUnreadCount(prev => prev + 1);
+      // Use the session's sendMessage which proxies to backend
+      if (!chatSession || !chatSession.sendMessage) {
+        throw new Error('Chat session not ready');
       }
+      const result = await chatSession.sendMessage({ message: userMsg });
+      const aiText = result?.text || "I'm sorry, I couldn't process that. Please try again.";
+      setMessages(prev => [...prev, { role: 'ai', text: aiText }]);
+
+      if (!isOpen) setUnreadCount(prev => prev + 1);
     } catch (err) {
       console.error(err);
       setMessages(prev => [...prev, { role: 'ai', text: "Error connecting to service. Please check your connection." }]);

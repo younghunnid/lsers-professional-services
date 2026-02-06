@@ -1,23 +1,40 @@
-import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
+import path from "path";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, process.cwd(), 'VITE_');
-    return {
-      server: {
-        port: 3000,
-        host: '0.0.0.0',
+  const isDev = mode === "development";
+
+  return {
+    base: isDev ? "/" : "/lsers-professional-services/",
+    plugins: [react()],
+    server: {
+      port: 3000,
+      host: "0.0.0.0",
+      proxy: isDev
+        ? {
+            "/api": {
+              target: "http://localhost:5000",
+              changeOrigin: true,
+              secure: false,
+            },
+          }
+        : undefined,
+    },
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "."),
       },
-      plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY || ''),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY || '')
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ["react", "react-dom"],
+          },
+        },
       },
-      resolve: {
-        alias: {
-          '@': path.resolve(__dirname, '.'),
-        }
-      }
-    };
+      chunkSizeWarningLimit: 1000,
+    },
+  };
 });

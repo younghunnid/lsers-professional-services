@@ -1,0 +1,8 @@
+{
+  "name": "LSERS Professional Services",
+  "description": "A premium marketplace connecting verified professionals with customers in Liberia and beyond. Find trust, skill, and opportunity for home, tech, and creative services.",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone"
+  ]
+}
